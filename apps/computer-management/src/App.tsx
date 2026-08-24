@@ -310,7 +310,7 @@ function NewRequestDialog() {
           )}
         </DialogBody>
         <DialogFooter>
-          <Button variant="ghost" size="md" onClick={() => stepIdx > 0 ? setStepIdx(stepIdx - 1) : setOpen(false)}>
+          <Button variant="text" size="md" onClick={() => stepIdx > 0 ? setStepIdx(stepIdx - 1) : setOpen(false)}>
             {stepIdx > 0 ? '上一步' : '取消'}
           </Button>
           <Button variant="primary" size="md" onClick={() => stepIdx < stepDefs.length - 1 ? setStepIdx(stepIdx + 1) : setOpen(false)}>
@@ -341,7 +341,7 @@ function HomePage({ onNav }: { onNav: (id: NavId) => void }) {
         <section className="rounded-lg border border-divider bg-surface">
           <div className="flex items-center justify-between px-[var(--layout-space-loose)] py-[var(--layout-space-tight)] border-b border-divider">
             <h2 className="text-body font-medium">近期申請單</h2>
-            <Button variant="ghost" size="sm" onClick={() => onNav('requests')}>查看全部</Button>
+            <Button variant="text" size="sm" onClick={() => onNav('requests')}>查看全部</Button>
           </div>
           <div className="divide-y divide-divider">
             {REQUESTS.slice(0, 3).map(r => (
@@ -362,7 +362,7 @@ function HomePage({ onNav }: { onNav: (id: NavId) => void }) {
         <section className="rounded-lg border border-divider bg-surface">
           <div className="flex items-center justify-between px-[var(--layout-space-loose)] py-[var(--layout-space-tight)] border-b border-divider">
             <h2 className="text-body font-medium">備份還原狀態</h2>
-            <Button variant="ghost" size="sm" onClick={() => onNav('backup')}>前往操作</Button>
+            <Button variant="text" size="sm" onClick={() => onNav('backup')}>前往操作</Button>
           </div>
           <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-loose)] space-y-[var(--layout-space-loose)]">
             <div className="flex items-center gap-[var(--layout-space-tight)]">
@@ -423,7 +423,7 @@ function RequestsPage() {
           return (
             <Button
               key={f.id}
-              variant={filter === f.id ? 'secondary' : 'ghost'}
+              variant={filter === f.id ? 'secondary' : 'text'}
               size="sm"
               onClick={() => setFilter(f.id)}
             >
@@ -652,10 +652,10 @@ function ReportsPage() {
   return (
     <div className="px-[var(--layout-space-loose)] py-[var(--layout-space-tight)] space-y-[var(--layout-space-tight)]">
       <div className="flex items-center gap-[var(--layout-space-tight)]">
-        <Button variant={role === 'director' ? 'secondary' : 'ghost'} size="sm" onClick={() => setRole('director')}>
+        <Button variant={role === 'director' ? 'secondary' : 'text'} size="sm" onClick={() => setRole('director')}>
           處長視角
         </Button>
-        <Button variant={role === 'manager' ? 'secondary' : 'ghost'} size="sm" onClick={() => setRole('manager')}>
+        <Button variant={role === 'manager' ? 'secondary' : 'text'} size="sm" onClick={() => setRole('manager')}>
           部經理視角
         </Button>
       </div>
