@@ -6,20 +6,19 @@ import type { Meta, StoryObj } from '@storybook/react'
 import App from './App'
 
 const meta: Meta<typeof App> = {
-  title: 'Apps/computer-management/AppShell Dashboard',
+  title: 'Apps/computer-management/Prototype (PC)',
   component: App,
   parameters: {
     layout: 'fullscreen',
     docs: {
       description: {
         component:
-          'AppShell Dashboard demo — DS canonical `AppShell + Sidebar + PageHeader` 完整 layout。\n\n' +
+          'Prototype (PC) — CPCM product UI,DS canonical `AppShell + Sidebar + PageHeader` 完整 layout。\n\n' +
           '客製 `App.tsx` 內的:\n' +
           '- `NAV` array(sidebar navigation 項目)\n' +
           '- `PageHeader` content(business-specific 標題 / actions)\n' +
           '- Page component(DashboardPage / OrderListPage / etc.)\n\n' +
-          'SSOT 鐵律:只 import `@qijenchen/design-system` exports,**禁修改 DS source**。\n\n' +
-          '從 template 衍生新 app:`npm run create-app <kebab-case-name>`。',
+          'SSOT 鐵律:只 import `@qijenchen/design-system` exports,**禁修改 DS source**。',
       },
     },
   },

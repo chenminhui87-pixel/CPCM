@@ -1,200 +1,130 @@
-# DS Product Template
+# CPCM — Computer Management
 
-> **GitHub Template Repository** for product team apps consuming [`@qijenchen/design-system`](https://github.com/ajenchen/design-system)。
+> Product app consuming [`@qijenchen/design-system`](https://github.com/ajenchen/design-system)。
 >
-> **Use this template** on GitHub → fork 為你自己的 repo,跑 `npm install` + `npm run create-app <product-name>` 就上線。
+> 單一 product app repo:`apps/computer-management/`。Storybook 展示真實 product UI,經 Netlify 部署。
 
 ## Status
 
-- **2026-05-27** repo 重命名 + template-friendly restructure(per fork-and-go workflow)
-- Seed app: `apps/template/`(預設範例,fork user 跑 create-app 後可刪)
-- Add a new product app: `npm run create-app <kebab-case-name>` → 在 `apps/<name>/` 開新 app
+- 單一 app:`apps/computer-management/`(CPCM)。
+- 原多-app scaffolding(`npm run create-app` / `apps/template/`)已移除 — 本 repo 專注 CPCM 一個 app。
+- 元件庫:`@qijenchen/design-system`(升版經 Dependabot / `npm update`)。
 
-## Template Usage(Day 0 onboarding,fork user 必讀)
+## Onboarding
 
-### Step 1 — Fork
-
-**Owner setup once**(本 repo 擁有者):GitHub `Settings → General → Template repository ✓` 勾選 + `Settings → General → Danger Zone → Change visibility: Public`(讓 fork user 看到「Use this template」按鈕)。
-
-**Fork user**:GitHub「Use this template」按鈕 → Create new repo from template。
-
-或:`git clone <this-repo>` + `git remote set-url origin <your-new-repo>`。
-
-### Step 2 — npm install(plugin install warning 自動跑)
+### Step 1 — clone + install
 
 ```bash
-npm install   # postinstall 紅色 warning 提示 /plugin install
+git clone https://github.com/chenminhui87-pixel/CPCM.git
+cd CPCM
+npm install   # 拉 DS deps + DS canonical 隨 npm 落地；postinstall 印 plugin 提示
 ```
 
-### Step 3 — Claude Code:plugin install + DS canonical cross-load
+### Step 2 — Claude Code:plugin install(本地 / 桌面 session)
 
 ```
 /plugin marketplace add github:ajenchen/design-system
 /plugin install design-system@qijenchen-ds
 ```
 
-### Step 4 — Spawn your first product app
+裝完 **restart session**。你會拿到 22+ skills、59 hooks、31 M-rules 的 DS 治理。
+
+> **遠端(claude.ai/code web)session 注意**:web session 無法互動安裝 plugin(需 `/plugin` 指令 + restart)。本 repo 已在 `.claude/settings.json` 啟用 hook 自帶的官方 escape `CLAUDE_BYPASS_PLUGIN_BOOTSTRAP=1`,讓遠端也能編輯 `apps/**`。此時治理改由:npm install 落地的 ds-canonical 規則 + 只用 DS 元件不自寫 mock + CI `audit.yml` 把關。
+
+### Step 3 — Setup Netlify(自動 site + 手動 password)
 
 ```bash
-npm run create-app order-dashboard   # 在 apps/order-dashboard/ 開新 app
-npm install                          # ← 必跑:重新 link workspace symlinks 讓新 app 拿 DS deps
-cd apps/order-dashboard
-npm run dev                          # localhost vite 啟動
-```
-
-**為何 `npm run create-app` 後要再跑 `npm install`?** npm workspaces 在新增 workspace dir 後需重新 `npm install` 才能把 `@qijenchen/design-system` symlink 到 `apps/order-dashboard/node_modules/`。漏跑 → vite 起來抓不到 DS package。
-
-Storybook root config `.storybook/main.ts` 自動 glob `apps/**/*.stories.tsx`,**每加新 app stories 自動現身 storybook**,不用手動 register。
-
-### Step 5 — Setup Netlify(自動 site + 手動 password,3 分鐘)
-
-```bash
-npm run setup:netlify   # 自動:CLI install + GitHub OAuth login + site 建 + 連 repo
+npm run setup:netlify   # CLI install + GitHub OAuth login + site 建 + 連 repo
                         # 最後印 dashboard URL + 教你 30 秒設 Basic Password
 ```
 
-**為何 Basic Password?** Identity(原本 invite-only 機制)2024 起 Netlify 已 deprecated,新帳號可能根本看不到 Identity menu;Team protection 鎖 Pro plan($19/mo)。**Basic Password 是 free-tier 唯一真擋陌生人的方法**(設一組共用 password,分享給 stakeholder)。
-
-### Step 6 — Push main → 自動部署
+### Step 4 — 本地 verify + 部署
 
 ```bash
-git push origin main   # Netlify auto build storybook + per-branch preview
+npm run storybook       # 本地確認 DS 元件視覺正確
+git push origin main    # Netlify auto build storybook + per-branch preview
 ```
-
-DS-side hook 自動 inject deploy URL into Claude reply(plugin 提供)。
-
-### Step 7 — Keep DS plugin + npm deps 永遠最新(auto-sync chain)
-
-DS repo 任何 push main → 兩條 auto-chain 同時跑,確保 fork repo 不偏移:
-
-**Chain 1 — npm dependency**(自動):
-- DS bump version + tag push → `release.yml` 跑 npm publish → `repository_dispatch ds-published`
-- DS push main(non-version SSOT change)→ `ssot-sync-dispatch.yml` 跑 → `repository_dispatch ds-ssot-changed`
-- 此 PW repo `.github/workflows/sync-design-system.yml` 收 event → `npm update @qijenchen/*` + commit + push
-- Netlify auto rebuild → DataTable / 全 token / 全 component 永遠最新
-
-**Chain 2 — Plugin hooks/skills/memory**(半自動):
-- DS 改 hook / skill / governance → plugin.json + marketplace.json 自動 bump version(per DS `sync-version-to-all-manifests.mjs`)
-- Fork user 在 terminal 跑 1 command(2026-05-27 改用 Claude CLI `claude plugin` integration):
-
-```bash
-npm run sync-all   # 同時 update npm + plugin marketplace + plugin install
-```
-
-完整等同手動跑:`npm update @qijenchen/*` + `claude plugin marketplace update qijenchen-ds` + `claude plugin update design-system@qijenchen-ds`。
-
-Plugin 改動需 **restart Claude Code session** 才 apply(SDK 限制)。
-
-Session_start hook `check_plugin_freshness.sh` 偵測 marketplace stale → prompt run `sync-all`。
 
 ## Layout
 
 ```
-ds-product-template/
-├── apps/                       ← Product apps (each is independent Vite + React)
-│   └── template/              ← Copy this via `npm run create-app <name>`
+CPCM/
+├── apps/
+│   └── computer-management/    ← CPCM product app (Vite + React)
 │       ├── src/
 │       │   ├── main.tsx        ← React root + TooltipProvider
-│       │   ├── App.tsx         ← Replace with your product UI
+│       │   ├── App.tsx         ← product UI (import DS 元件)
+│       │   ├── App.stories.tsx ← Storybook: Prototype (PC)
+│       │   ├── AllDsComponents.stories.tsx ← DS canonical proxy portal
 │       │   └── globals.css     ← @import tailwindcss + DS tokens
 │       ├── index.html
 │       ├── package.json
 │       ├── tsconfig.json
 │       └── vite.config.ts
-├── packages/                   ← Cross-app shared utilities (if any)
 ├── scripts/
-│   ├── create-app.mjs          ← `npm run create-app <name>` generator
-│   └── lint-ds-internal-imports.mjs  ← Guard against importing DS internals
+│   ├── lint-ds-internal-imports.mjs  ← Guard against importing DS internals
+│   ├── setup-netlify-access.mjs      ← npm run setup:netlify
+│   ├── deploy-url.mjs                ← npm run deploy-url
+│   └── sync-all.mjs                  ← npm run sync-all
 ├── .claude/
-│   └── settings.json           ← Claude Code config (plugin marketplace flow)
-├── .storybook/                 ← Shared Storybook config (imports @qijenchen/storybook-config)
-├── .github/
-│   ├── CODEOWNERS              ← Code review routing
-│   └── workflows/
-│       ├── audit.yml           ← tsc + lint + build per push/PR
-│       └── sync-design-system.yml ← Dependabot + DS 版本同步(repository_dispatch)
+│   ├── settings.json           ← Claude Code config (plugin flow + remote escape)
+│   └── hooks/                  ← fork-committed bootstrap hooks
+├── .storybook/                 ← Storybook config (imports @qijenchen/storybook-config)
+├── .github/workflows/
+│   ├── audit.yml               ← tsc + lint:imports + build per push/PR
+│   └── sync-design-system.yml  ← Dependabot + DS 版本同步(repository_dispatch)
+├── netlify.toml                ← Netlify Git integration (build + access headers)
 ├── package.json                ← workspaces + DS deps
-├── tsconfig.json               ← Base TS config (apps extend)
 └── README.md                   ← You are here
 ```
 
-## Claude Code plugin setup(first time)
+## Consumer rules(read DS CLAUDE.md via plugin / `node_modules/@qijenchen/design-system/`)
 
-```
-/plugin marketplace add github:ajenchen/design-system
-/plugin install design-system@qijenchen-ds
-```
+- **Never modify** `node_modules/@qijenchen/design-system/` — 有需求 file PR 回 DS repo。
+- Import public surface only:`@qijenchen/design-system` top barrel。**禁** import `/src/...` 或 `/dist/...` internals。
+- Run `npm run lint:imports` before commit to catch internal-path leaks。
+- App-level CSS 只 extend / override,不重寫 DS tokens(`--color-*` / `--space-*`)。
+- App.tsx 起點走 AppShell + Sidebar,不從孤立 Button 開始。
 
-Then plugin auto-enables (`.claude/settings.json` `defaultMode: "auto"`). You get:
-- 22+ skills (`/component-quality-gate`, `/visual-audit`, etc.)
-- 59 hooks (auto-fire pre/post tool events)
-- 31 active M-rules (CLAUDE.md instructions inherit on every session)
+## Keep DS deps 最新
 
-## Important rules(read CLAUDE.md from `design-system` repo via plugin)
-
-- **Never modify** `node_modules/@qijenchen/design-system/`(install another copy if you need experimental changes — file PR to DS repo instead)
-- Import only from public surface: `@qijenchen/design-system` top barrel,`@qijenchen/design-system/styles/tokens`,`@qijenchen/design-system/hooks/<name>`
-- Run `npm run lint:imports` before commit to catch internal-path leaks
-
-## Cloud-dev paths(全雲端,3 條路選一條走)
-
-**Path 1 — Claude Code 直連 repo(推薦,真正零地端依賴)**:在 claude.ai/code(或 Claude 桌面 / VS Code extension)直接連你的 GitHub fork repo;Claude 把 repo clone 進 ephemeral sandbox,所有 governance hooks + skills + npm + git ops 在 sandbox 內跑。寫完 commit / push 回 GitHub。**這是 user 目前實際工作流**;不需要 Codespaces 也不需本地 IDE。
-
-**Path 2 — GitHub Codespaces(2026-05-29 ship `.devcontainer/`,給不用 Claude Code 直連的 user)**:fork repo → `<> Code → Codespaces → Create codespace on main` → container 自動裝 Node 22 + gh CLI + jq + `@anthropic-ai/claude-code` + `netlify-cli` + Tailwind / ESLint / Prettier ext + `npm install`(via `postCreateCommand`)。Terminal 自動顯示中文 onboard banner。免費 60h/月。
-
-**Path 3 — 本地**:`git clone` + `npm install` + `claude`(本地 macOS/Linux/WSL)。
-
-**3 path 共通 3 step 上工**(無論在 sandbox / Codespaces / 本地 都一樣):
 ```bash
-claude                                                         # ① 啟動 Claude Code
-# 內輸: /plugin marketplace add github:ajenchen/design-system    # ② 拿 DS 治理 plugin
-# 內輸: /plugin install design-system@qijenchen-ds                #    啟用 22 skills + 59 hooks
-npm run setup:netlify                                          # ③ Netlify OAuth + 印 dashboard URL
-# 開瀏覽器點 Visitor access → Basic protection → 輸 password → Save
+npm run sync-all              # update npm deps + plugin marketplace + plugin install
+# 或單獨: npm update @qijenchen/design-system @qijenchen/storybook-config
 ```
 
-Deploy URL 在 push 後 hook `inject_deploy_url_after_push.sh` 自動 inject 進 Claude reply(`https://<branch>--<owner>-<repo>.netlify.app` 推導 + curl 200 verify + Storybook content sniff)。
+DS repo push main 時,`sync-design-system.yml`(Dependabot + `repository_dispatch`)會自動 bump deps + commit。
 
 ## Storybook deploy(無需 GitHub secret)
 
 **Step 1 — Connect Netlify**:
-1. Netlify Dashboard → **Add new project** → 連 fork 後的 `ds-product-template` repo
+1. Netlify Dashboard → **Add new project** → 連本 repo
 2. Netlify 自動讀根目錄 `netlify.toml` → build `storybook-static` → deploy
 3. 每次 push main → Netlify auto rebuild。Per-branch preview 自動啟用。
 
 **Step 2 — 🔒 設 Basic Password Protection**(free-tier 唯一可用 access control):
 
-`npm run setup:netlify` 自動跑完 CLI install + login + site 建 + 連 repo,**最後印 dashboard 連結 + 30 秒 password 設定指引**。
-
-跟著 script 印的步驟手動 dashboard 設:
+`npm run setup:netlify` 跑完會印 dashboard 連結 + password 設定指引。跟著做:
 1. 打開 `https://app.netlify.com/projects/<your-site>/configuration/visitor-access`
 2. **Password Protection** → 選「**Basic protection**」→ 輸 password → **Save**
-3. 把 site URL + password 私訊給 stakeholder(team Slack / DM)
+3. 把 site URL + password 私訊給 stakeholder
 
-**為何只用 Basic Password?**(誠實版,2026-05-29 確認):
-- ❌ **Identity** = 2024 起 Netlify 公告 deprecated;新帳號可能看不到 Identity menu。原本「invite-only per-user」路徑**不再可用**
-- ❌ **Team protection 🔒** = 鎖,要 Pro plan $19/mo(fork user 不該被迫付費)
-- ❌ **Non-production deploys only 🔒** = 同上鎖
-- ✅ **Basic Password** = free-tier 唯一真擋陌生人的方法(設共用 password,分享 team)
+**為何只用 Basic Password?**
+- ❌ **Identity** = 2024 起 Netlify deprecated,新帳號看不到 menu
+- ❌ **Team protection** = 要 Pro plan $19/mo
+- ✅ **Basic Password** = free-tier 唯一真擋陌生人的方法
 
-**Defense-in-depth**(`netlify.toml` 已 ship):X-Robots-Tag noindex(搜尋引擎不收錄 URL)+ Referrer strict-origin + X-Frame SAMEORIGIN — SEO 層加固,**真實擋人**靠 Basic Password 那一層。
+**Defense-in-depth**(`netlify.toml` 已 ship):X-Robots-Tag noindex + Referrer strict-origin + X-Frame SAMEORIGIN — SEO 層加固;**真實擋人**靠 Basic Password。
 
-**要更細權限**?三條路:
-- 升 **Netlify Pro** $19/mo → 解鎖 Team protection(per-account login + audit log)
-- 自架 **Cloudflare Access**(免費 50 user;setup 比 Netlify 複雜)
-- 公開 site,只防 SEO(`X-Robots-Tag noindex`)— 若 stakeholder 不介意 URL 知道就能看
+## Workflow 機制總覽
 
-### Workflow 機制總覽
-
-本 repo `.github/workflows/` 實際只有 2 個 workflow,deploy 不走 GitHub Actions:
+deploy 不走 GitHub Actions,只有 2 個 workflow:
 
 | 機制 | 觸發 | 做什麼 |
 |---|---|---|
 | `audit.yml` | push / PR | tsc + `lint:imports` + build CI gate |
-| `sync-design-system.yml` | Dependabot daily + `repository_dispatch`(DS release/SSOT change)| `npm update @qijenchen/*` + commit + push,讓 DS deps 永遠最新 |
-| `netlify.toml`(Netlify Git integration)| push main / per-branch | build `storybook-static` → deploy(無需 GitHub secret)|
-
-Storybook(含真實 product UI demo)透過 `netlify.toml` 的 Netlify Git integration 直接 deploy,push main 即 auto rebuild;不需要 `NETLIFY_AUTH_TOKEN` / site ID secret。
+| `sync-design-system.yml` | Dependabot daily + `repository_dispatch` | `npm update @qijenchen/*` + commit + push |
+| `netlify.toml`(Netlify Git integration)| push main / per-branch | build `storybook-static` → deploy(無需 secret)|
 
 完整 step-by-step 詳 `docs/01-first-time-setup.md`。
 
