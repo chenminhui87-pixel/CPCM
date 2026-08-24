@@ -12,9 +12,9 @@
 ## Steps
 
 ```bash
-# 1. Create from template or clone
-git clone git@github.com:ajenchen/ds-product-template.git
-cd ds-product-template
+# 1. Clone
+git clone https://github.com/chenminhui87-pixel/CPCM.git
+cd CPCM
 
 # 2. Install workspace deps
 npm install
@@ -34,10 +34,10 @@ After plugin install, restart the Claude Code session so skills and hooks are lo
 
 ## Verify
 
-- `npm run create-app test-app` creates `apps/test-app/`.
-- `cd apps/test-app && npm run dev` opens a styled Vite app.
+- `cd apps/computer-management && npm run dev` opens a styled Vite app.
+- `npm run storybook` shows the CPCM `Prototype (PC)` story with DS components styled correctly.
 - Claude `/` shows DS skills such as `/design-system-audit`, `/component-quality-gate`, `/visual-audit`, and `/prototype`.
 
 ## Next
 
-Run `npm run setup:netlify`, then continue with `docs/02-create-new-product.md`.
+Run `npm run setup:netlify` to connect the Storybook deploy, then see `docs/03-co-edit-workflow.md`.
